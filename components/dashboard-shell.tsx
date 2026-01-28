@@ -142,9 +142,11 @@ export default function DashboardShell({
               <span className="text-sm font-semibold">Local Service Ops</span>
             </div>
           </div>
-          <Button size="sm" className="w-full justify-start">
-            <Plus className="size-4" />
-            Quick Create
+          <Button asChild size="sm" className="w-full justify-start">
+            <Link href="/leads/new">
+              <Plus className="size-4" />
+              Quick Create
+            </Link>
           </Button>
         </SidebarHeader>
         <SidebarSeparator />
