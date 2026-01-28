@@ -88,7 +88,7 @@ export default function LeadsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Lead Queue</CardTitle>
-          <CardDescription>Most recent lead intake.</CardDescription>
+          <CardDescription>Most recent lead intake (showing 10).</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -104,7 +104,7 @@ export default function LeadsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {leads.map((lead) => (
+                {leads.slice(0, 10).map((lead) => (
                   <TableRow key={lead.id}>
                     <TableCell className="font-medium">
                       <Link href={`/leads/${lead.id}`} className="hover:underline">

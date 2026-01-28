@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ import {
   runAgent,
   Lead,
 } from "@/lib/api";
+import ActivityTimeline from "@/components/activity-timeline";
 
 type PricingRule = {
   id: string;
@@ -44,8 +46,10 @@ type Subcontractor = {
   }>;
 };
 
-export default function LeadDetailPage({ params }: { params: { id: string } }) {
-  const leadId = params.id;
+export default function LeadDetailPage() {
+  const params = useParams<{ id?: string }>();
+  const leadId =
+    typeof params?.id === "string" ? params.id : Array.isArray(params?.id) ? params.id[0] : undefined;
   const [lead, setLead] = useState<Lead | null>(null);
   const [pricingRules, setPricingRules] = useState<PricingRule[]>([]);
   const [subcontractors, setSubcontractors] = useState<Subcontractor[]>([]);
@@ -117,6 +121,23 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
       </div>
     );
   }
+
+  const plan = agentResult?.plan as
+    | {
+        service_code?: string;
+        urgency_level?: string;
+        quote?: { total_cents?: number };
+        schedule?: { date?: string; window_start?: string; window_end?: string };
+        subcontractor_id?: string | null;
+        customer_message?: string;
+        confidence?: number;
+      }
+    | undefined;
+
+  const currency = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
 
   return (
     <div className="space-y-8">
@@ -239,42 +260,168 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
           <CardTitle>Agent Output</CardTitle>
           <CardDescription>Latest plan + execution results.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
           {agentResult ? (
-            <div className="grid gap-4 lg:grid-cols-2">
-              <div className="rounded-md border border-border bg-muted p-4">
-                <p className="text-xs text-muted-foreground">Plan JSON</p>
-                <pre className="mt-2 max-h-80 overflow-auto text-xs text-foreground">
-                  {JSON.stringify(agentResult.plan, null, 2)}
-                </pre>
+            <>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Plan Summary</CardTitle>
+                  <CardDescription>Readable view of the agent plan.</CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-3 text-sm text-muted-foreground md:grid-cols-2">
+                  <div>
+                    <p className="text-xs uppercase text-muted-foreground">Service</p>
+                    <p className="text-foreground">{plan?.service_code || "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase text-muted-foreground">Urgency</p>
+                    <p className="text-foreground">{plan?.urgency_level || "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase text-muted-foreground">Total</p>
+                    <p className="text-foreground">
+                      {plan?.quote?.total_cents
+                        ? currency.format(plan.quote.total_cents / 100)
+                        : "—"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase text-muted-foreground">Confidence</p>
+                    <p className="text-foreground">
+                      {plan?.confidence ? `${Math.round(plan.confidence * 100)}%` : "—"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase text-muted-foreground">Schedule</p>
+                    <p className="text-foreground">
+                      {plan?.schedule?.date || "—"}{" "}
+                      {plan?.schedule?.window_start
+                        ? `${plan.schedule.window_start}-${plan.schedule.window_end}`
+                        : ""}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase text-muted-foreground">Subcontractor</p>
+                    <p className="text-foreground">{plan?.subcontractor_id || "—"}</p>
+                  </div>
+                  <div className="md:col-span-2">
+                    <p className="text-xs uppercase text-muted-foreground">Customer Message</p>
+                    <p className="text-foreground">{plan?.customer_message || "—"}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Quote</CardTitle>
+                    <CardDescription>Generated pricing record.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-sm text-muted-foreground space-y-2">
+                    {agentResult.quote ? (
+                      <>
+                        <p className="text-foreground">
+                          {currency.format(
+                            Number((agentResult.quote as any).total_cents || 0) / 100
+                          )}
+                        </p>
+                        {(agentResult.quote as any).id && (
+                          <Link
+                            href={`/quotes/${(agentResult.quote as any).id}`}
+                            className="text-foreground underline"
+                          >
+                            View quote
+                          </Link>
+                        )}
+                      </>
+                    ) : (
+                      <p>Run Execute to create a quote.</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Job</CardTitle>
+                    <CardDescription>Scheduled job record.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-sm text-muted-foreground space-y-2">
+                    {agentResult.job ? (
+                      <>
+                        <p className="text-foreground">
+                          {(agentResult.job as any).scheduled_date || "—"}{" "}
+                          {(agentResult.job as any).scheduled_window_start || ""}-
+                          {(agentResult.job as any).scheduled_window_end || ""}
+                        </p>
+                        {(agentResult.job as any).id && (
+                          <Link
+                            href={`/jobs/${(agentResult.job as any).id}`}
+                            className="text-foreground underline"
+                          >
+                            View job
+                          </Link>
+                        )}
+                      </>
+                    ) : (
+                      <p>Run Execute to create a job.</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Assignment</CardTitle>
+                    <CardDescription>Subcontractor assignment.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-sm text-muted-foreground space-y-2">
+                    {agentResult.assignment ? (
+                      <>
+                        <p className="text-foreground">
+                          Status: {(agentResult.assignment as any).status || "—"}
+                        </p>
+                        {(agentResult.assignment as any).id && (
+                          <Link
+                            href={`/assignments/${(agentResult.assignment as any).id}`}
+                            className="text-foreground underline"
+                          >
+                            View assignment
+                          </Link>
+                        )}
+                      </>
+                    ) : (
+                      <p>Run Execute to assign a subcontractor.</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Notification</CardTitle>
+                    <CardDescription>Outbound message record.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-sm text-muted-foreground space-y-2">
+                    {agentResult.notification ? (
+                      <>
+                        <p className="text-foreground">
+                          {(agentResult.notification as any).status || "—"} ·{" "}
+                          {(agentResult.notification as any).channel || "email"}
+                        </p>
+                        {(agentResult.notification as any).id && (
+                          <Link
+                            href={`/notifications/${(agentResult.notification as any).id}`}
+                            className="text-foreground underline"
+                          >
+                            View notification
+                          </Link>
+                        )}
+                      </>
+                    ) : (
+                      <p>Run Execute to send a notification.</p>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
-              <div className="space-y-3 text-sm text-muted-foreground">
-                <div>
-                  <p className="text-muted-foreground">Quote</p>
-                  <pre className="rounded-md border border-border bg-muted p-3 text-xs text-foreground">
-                    {JSON.stringify(agentResult.quote, null, 2)}
-                  </pre>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Job</p>
-                  <pre className="rounded-md border border-border bg-muted p-3 text-xs text-foreground">
-                    {JSON.stringify(agentResult.job, null, 2)}
-                  </pre>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Assignment</p>
-                  <pre className="rounded-md border border-border bg-muted p-3 text-xs text-foreground">
-                    {JSON.stringify(agentResult.assignment, null, 2)}
-                  </pre>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Notification</p>
-                  <pre className="rounded-md border border-border bg-muted p-3 text-xs text-foreground">
-                    {JSON.stringify(agentResult.notification, null, 2)}
-                  </pre>
-                </div>
-              </div>
-            </div>
+            </>
           ) : (
             <p className="text-sm text-muted-foreground">
               Run the agent to view the plan and generated records.
@@ -289,21 +436,7 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
           <CardDescription>Agent + execution activity.</CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-3 text-sm text-muted-foreground">
-            {timeline.map((event) => (
-              <li
-                key={`${event.type}-${event.id}`}
-                className="rounded-md border border-border bg-muted p-3"
-              >
-                <p className="text-xs uppercase text-muted-foreground">
-                  {event.type}
-                </p>
-                <pre className="mt-2 text-xs text-foreground">
-                  {JSON.stringify(event, null, 2)}
-                </pre>
-              </li>
-            ))}
-          </ul>
+          <ActivityTimeline events={timeline as any[]} />
         </CardContent>
       </Card>
     </div>
