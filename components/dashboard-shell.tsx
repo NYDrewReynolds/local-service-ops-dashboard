@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
   Sidebar,
@@ -62,7 +61,6 @@ export default function DashboardShell({
             <Plus className="size-4" />
             Quick Create
           </Button>
-          <Input placeholder="Search" className="h-8" />
         </SidebarHeader>
         <SidebarSeparator />
         <SidebarContent>
