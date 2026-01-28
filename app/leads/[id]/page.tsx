@@ -2,6 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   AgentRunResult,
   getLead,
@@ -107,20 +117,19 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
           <p className="text-sm text-slate-400">{lead.service_requested}</p>
         </div>
         <div className="flex gap-3">
-          <button
-            className="rounded-md border border-slate-700 px-4 py-2 text-sm"
+          <Button
+            variant="outline"
             onClick={() => handleRunAgent("plan_only")}
             disabled={loading}
           >
             Run Agent (Plan Only)
-          </button>
-          <button
-            className="rounded-md bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950"
+          </Button>
+          <Button
             onClick={() => handleRunAgent("execute")}
             disabled={loading}
           >
             Run Agent (Execute)
-          </button>
+          </Button>
         </div>
       </header>
 
@@ -131,130 +140,161 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
       )}
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-6">
-          <h3 className="text-lg font-semibold">Lead Details</h3>
-          <dl className="mt-4 space-y-2 text-sm text-slate-300">
-            <div>
-              <dt className="text-slate-400">Email</dt>
-              <dd>{lead.email || "—"}</dd>
-            </div>
-            <div>
-              <dt className="text-slate-400">Phone</dt>
-              <dd>{lead.phone || "—"}</dd>
-            </div>
-            <div>
-              <dt className="text-slate-400">Address</dt>
-              <dd>
-                {lead.address_line1}, {lead.city}, {lead.state}{" "}
-                {lead.postal_code}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-slate-400">Urgency</dt>
-              <dd>{lead.urgency_hint || "—"}</dd>
-            </div>
-            <div>
-              <dt className="text-slate-400">Status</dt>
-              <dd>{lead.status}</dd>
-            </div>
-            <div>
-              <dt className="text-slate-400">Notes</dt>
-              <dd>{lead.notes || "—"}</dd>
-            </div>
-          </dl>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Lead Details</CardTitle>
+            <CardDescription>Contact + request summary.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <dl className="space-y-3 text-sm text-slate-300">
+              <div>
+                <dt className="text-slate-400">Email</dt>
+                <dd>{lead.email || "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-slate-400">Phone</dt>
+                <dd>{lead.phone || "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-slate-400">Address</dt>
+                <dd>
+                  {lead.address_line1}, {lead.city}, {lead.state}{" "}
+                  {lead.postal_code}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-slate-400">Urgency</dt>
+                <dd>{lead.urgency_hint || "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-slate-400">Status</dt>
+                <dd>
+                  <Badge variant={lead.status === "failed" ? "danger" : "default"}>
+                    {lead.status}
+                  </Badge>
+                </dd>
+              </div>
+              <div>
+                <dt className="text-slate-400">Notes</dt>
+                <dd>{lead.notes || "—"}</dd>
+              </div>
+            </dl>
+          </CardContent>
+        </Card>
 
-        <div className="rounded-lg border border-slate-800 bg-slate-900 p-6">
-          <h3 className="text-lg font-semibold">Pricing Rules</h3>
-          <ul className="mt-4 space-y-2 text-sm text-slate-300">
-            {pricingRules.map((rule) => (
-              <li key={rule.id}>
-                <span className="font-medium text-slate-100">
-                  {rule.service_code}
-                </span>{" "}
-                — min {rule.min_price_cents} / max {rule.max_price_cents} / base{" "}
-                {rule.base_price_cents}
+        <Card>
+          <CardHeader>
+            <CardTitle>Pricing Rules</CardTitle>
+            <CardDescription>Guardrails applied to quotes.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-sm text-slate-300">
+              {pricingRules.map((rule) => (
+                <li key={rule.id}>
+                  <span className="font-medium text-slate-100">
+                    {rule.service_code}
+                  </span>{" "}
+                  — min {rule.min_price_cents} / max {rule.max_price_cents} / base{" "}
+                  {rule.base_price_cents}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      </section>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Subcontractors</CardTitle>
+          <CardDescription>Read-only coverage list.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2">
+            {subcontractors.map((sub) => (
+              <Card key={sub.id} className="border-slate-800 bg-slate-950">
+                <CardHeader>
+                  <CardTitle className="text-base">{sub.name}</CardTitle>
+                  <CardDescription>{sub.phone}</CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0 text-xs text-slate-500">
+                  Services: {sub.service_codes.join(", ")}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Agent Output</CardTitle>
+          <CardDescription>Latest plan + execution results.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {agentResult ? (
+            <div className="grid gap-4 lg:grid-cols-2">
+              <div className="rounded-md border border-slate-800 bg-slate-950 p-4">
+                <p className="text-xs text-slate-400">Plan JSON</p>
+                <pre className="mt-2 max-h-80 overflow-auto text-xs text-slate-200">
+                  {JSON.stringify(agentResult.plan, null, 2)}
+                </pre>
+              </div>
+              <div className="space-y-3 text-sm text-slate-300">
+                <div>
+                  <p className="text-slate-400">Quote</p>
+                  <pre className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200">
+                    {JSON.stringify(agentResult.quote, null, 2)}
+                  </pre>
+                </div>
+                <div>
+                  <p className="text-slate-400">Job</p>
+                  <pre className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200">
+                    {JSON.stringify(agentResult.job, null, 2)}
+                  </pre>
+                </div>
+                <div>
+                  <p className="text-slate-400">Assignment</p>
+                  <pre className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200">
+                    {JSON.stringify(agentResult.assignment, null, 2)}
+                  </pre>
+                </div>
+                <div>
+                  <p className="text-slate-400">Notification</p>
+                  <pre className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200">
+                    {JSON.stringify(agentResult.notification, null, 2)}
+                  </pre>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-slate-400">
+              Run the agent to view the plan and generated records.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Audit Timeline</CardTitle>
+          <CardDescription>Agent + execution activity.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-3 text-sm text-slate-300">
+            {timeline.map((event) => (
+              <li
+                key={`${event.type}-${event.id}`}
+                className="rounded-md border border-slate-800 bg-slate-950 p-3"
+              >
+                <p className="text-xs uppercase text-slate-500">{event.type}</p>
+                <pre className="mt-2 text-xs text-slate-200">
+                  {JSON.stringify(event, null, 2)}
+                </pre>
               </li>
             ))}
           </ul>
-        </div>
-      </section>
-
-      <section className="rounded-lg border border-slate-800 bg-slate-900 p-6">
-        <h3 className="text-lg font-semibold">Subcontractors</h3>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          {subcontractors.map((sub) => (
-            <div key={sub.id} className="rounded-md border border-slate-800 p-4">
-              <p className="font-medium text-slate-100">{sub.name}</p>
-              <p className="text-sm text-slate-400">{sub.phone}</p>
-              <p className="text-xs text-slate-500">
-                Services: {sub.service_codes.join(", ")}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="rounded-lg border border-slate-800 bg-slate-900 p-6">
-        <h3 className="text-lg font-semibold">Agent Output</h3>
-        {agentResult ? (
-          <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            <div className="rounded-md border border-slate-800 bg-slate-950 p-4">
-              <p className="text-xs text-slate-400">Plan JSON</p>
-              <pre className="mt-2 max-h-80 overflow-auto text-xs text-slate-200">
-                {JSON.stringify(agentResult.plan, null, 2)}
-              </pre>
-            </div>
-            <div className="space-y-3 text-sm text-slate-300">
-              <div>
-                <p className="text-slate-400">Quote</p>
-                <pre className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200">
-                  {JSON.stringify(agentResult.quote, null, 2)}
-                </pre>
-              </div>
-              <div>
-                <p className="text-slate-400">Job</p>
-                <pre className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200">
-                  {JSON.stringify(agentResult.job, null, 2)}
-                </pre>
-              </div>
-              <div>
-                <p className="text-slate-400">Assignment</p>
-                <pre className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200">
-                  {JSON.stringify(agentResult.assignment, null, 2)}
-                </pre>
-              </div>
-              <div>
-                <p className="text-slate-400">Notification</p>
-                <pre className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200">
-                  {JSON.stringify(agentResult.notification, null, 2)}
-                </pre>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <p className="mt-2 text-sm text-slate-400">
-            Run the agent to view the plan and generated records.
-          </p>
-        )}
-      </section>
-
-      <section className="rounded-lg border border-slate-800 bg-slate-900 p-6">
-        <h3 className="text-lg font-semibold">Audit Timeline</h3>
-        <ul className="mt-4 space-y-3 text-sm text-slate-300">
-          {timeline.map((event) => (
-            <li
-              key={`${event.type}-${event.id}`}
-              className="rounded-md border border-slate-800 bg-slate-950 p-3"
-            >
-              <p className="text-xs uppercase text-slate-500">{event.type}</p>
-              <pre className="mt-2 text-xs text-slate-200">
-                {JSON.stringify(event, null, 2)}
-              </pre>
-            </li>
-          ))}
-        </ul>
-      </section>
+        </CardContent>
+      </Card>
     </div>
   );
 }

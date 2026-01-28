@@ -2,6 +2,26 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { createLead, getLeads, populateDemo, Lead } from "@/lib/api";
 
 const emptyLead: Partial<Lead> = {
@@ -25,6 +45,20 @@ export default function LeadsPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const showDemo = process.env.NODE_ENV !== "production";
+
+  const fields = [
+    { key: "full_name", label: "Full name" },
+    { key: "email", label: "Email" },
+    { key: "phone", label: "Phone" },
+    { key: "address_line1", label: "Address line 1" },
+    { key: "address_line2", label: "Address line 2" },
+    { key: "city", label: "City" },
+    { key: "state", label: "State" },
+    { key: "postal_code", label: "Postal code" },
+    { key: "service_requested", label: "Service requested" },
+    { key: "notes", label: "Notes" },
+    { key: "urgency_hint", label: "Urgency hint" },
+  ] as const;
 
   const loadLeads = async () => {
     setLoading(true);
@@ -79,13 +113,9 @@ export default function LeadsPage() {
           </p>
         </div>
         {showDemo && (
-          <button
-            className="rounded-md bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950"
-            onClick={handleDemo}
-            disabled={submitting}
-          >
+          <Button onClick={handleDemo} disabled={submitting}>
             Populate Demo Data
-          </button>
+          </Button>
         )}
       </header>
 
@@ -95,70 +125,74 @@ export default function LeadsPage() {
         </div>
       )}
 
-      <section className="rounded-lg border border-slate-800 bg-slate-900 p-6">
-        <h3 className="text-lg font-semibold">New Lead</h3>
-        <form className="mt-4 grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
-          {Object.entries(form).map(([key, value]) => (
-            <label key={key} className="flex flex-col text-sm text-slate-300">
-              <span className="capitalize">{key.replaceAll("_", " ")}</span>
-              <input
-                className="mt-1 rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100"
-                value={value ?? ""}
-                onChange={(event) =>
-                  setForm({ ...form, [key]: event.target.value })
-                }
-              />
-            </label>
-          ))}
-          <div className="md:col-span-2 flex justify-end">
-            <button
-              className="rounded-md bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-950"
-              type="submit"
-              disabled={submitting}
-            >
-              Create Lead
-            </button>
-          </div>
-        </form>
-      </section>
+      <Card>
+        <CardHeader>
+          <CardTitle>New Lead</CardTitle>
+          <CardDescription>Capture a new lead for planning.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
+            {fields.map((field) => (
+              <div key={field.key} className="grid gap-2">
+                <Label htmlFor={field.key}>{field.label}</Label>
+                <Input
+                  id={field.key}
+                  value={(form as Record<string, string | undefined>)[field.key] ?? ""}
+                  onChange={(event) =>
+                    setForm({ ...form, [field.key]: event.target.value })
+                  }
+                />
+              </div>
+            ))}
+            <div className="md:col-span-2 flex justify-end">
+              <Button type="submit" disabled={submitting}>
+                Create Lead
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
 
-      <section className="rounded-lg border border-slate-800 bg-slate-900">
-        <div className="border-b border-slate-800 px-6 py-4">
-          <h3 className="text-lg font-semibold">Lead Queue</h3>
-        </div>
-        <div className="px-6 py-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Lead Queue</CardTitle>
+          <CardDescription>Most recent lead intake.</CardDescription>
+        </CardHeader>
+        <CardContent>
           {loading ? (
             <p className="text-sm text-slate-400">Loading leads...</p>
           ) : (
-            <table className="w-full text-sm">
-              <thead className="text-left text-slate-400">
-                <tr>
-                  <th className="py-2">Name</th>
-                  <th className="py-2">Service</th>
-                  <th className="py-2">Urgency</th>
-                  <th className="py-2">Status</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Service</TableHead>
+                  <TableHead>Urgency</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {leads.map((lead) => (
-                  <tr key={lead.id} className="border-t border-slate-800">
-                    <td className="py-3 font-medium text-slate-100">
+                  <TableRow key={lead.id}>
+                    <TableCell className="font-medium">
                       <Link href={`/leads/${lead.id}`} className="hover:underline">
                         {lead.full_name}
                       </Link>
-                    </td>
-                    <td className="py-3 text-slate-300">
-                      {lead.service_requested}
-                    </td>
-                    <td className="py-3 text-slate-300">{lead.urgency_hint}</td>
-                    <td className="py-3 text-slate-300">{lead.status}</td>
-                  </tr>
+                    </TableCell>
+                    <TableCell>{lead.service_requested}</TableCell>
+                    <TableCell>{lead.urgency_hint || "—"}</TableCell>
+                    <TableCell>
+                      <Badge variant={lead.status === "failed" ? "danger" : "default"}>
+                        {lead.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           )}
-        </div>
-      </section>
+        </CardContent>
+      </Card>
     </div>
   );
 }

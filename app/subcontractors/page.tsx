@@ -1,6 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { getSubcontractors } from "@/lib/api";
 
 type Subcontractor = {
@@ -52,27 +60,28 @@ export default function SubcontractorsPage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         {subcontractors.map((sub) => (
-          <div
-            key={sub.id}
-            className="rounded-lg border border-slate-800 bg-slate-900 p-6"
-          >
-            <h3 className="text-lg font-semibold">{sub.name}</h3>
-            <p className="text-sm text-slate-400">{sub.phone}</p>
-            <p className="mt-2 text-xs text-slate-500">
-              Services: {sub.service_codes.join(", ")}
-            </p>
-            <div className="mt-4">
-              <p className="text-xs uppercase text-slate-500">Availability</p>
-              <ul className="mt-2 space-y-1 text-sm text-slate-300">
-                {sub.subcontractor_availabilities.map((slot) => (
-                  <li key={slot.id}>
-                    {dayNames[slot.day_of_week]} {slot.window_start}-
-                    {slot.window_end}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          <Card key={sub.id}>
+            <CardHeader>
+              <CardTitle>{sub.name}</CardTitle>
+              <CardDescription>{sub.phone}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-slate-500">
+                Services: {sub.service_codes.join(", ")}
+              </p>
+              <div className="mt-4">
+                <p className="text-xs uppercase text-slate-500">Availability</p>
+                <ul className="mt-2 space-y-1 text-sm text-slate-300">
+                  {sub.subcontractor_availabilities.map((slot) => (
+                    <li key={slot.id}>
+                      {dayNames[slot.day_of_week]} {slot.window_start}-
+                      {slot.window_end}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>

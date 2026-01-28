@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+
+import { buttonVariants } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -28,12 +31,17 @@ export default function RootLayout({
             <p className="mt-2 text-sm text-slate-400">
               MVP admin workflow
             </p>
-            <nav className="mt-8 space-y-2 text-sm">
+            <Separator className="my-6" />
+            <nav className="space-y-2 text-sm">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block rounded-md px-3 py-2 text-slate-200 hover:bg-slate-800"
+                  className={buttonVariants({
+                    variant: "ghost",
+                    className:
+                      "w-full justify-start text-slate-200 hover:text-slate-100",
+                  })}
                 >
                   {link.label}
                 </Link>

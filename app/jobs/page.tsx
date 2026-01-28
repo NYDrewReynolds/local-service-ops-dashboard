@@ -2,6 +2,23 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { getJobs } from "@/lib/api";
 
 type Job = {
@@ -48,42 +65,45 @@ export default function JobsPage() {
         </div>
       )}
 
-      <section className="rounded-lg border border-slate-800 bg-slate-900">
-        <div className="border-b border-slate-800 px-6 py-4">
-          <h3 className="text-lg font-semibold">Job Queue</h3>
-        </div>
-        <div className="px-6 py-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Job Queue</CardTitle>
+          <CardDescription>Scheduled and dispatched work.</CardDescription>
+        </CardHeader>
+        <CardContent>
           {loading ? (
             <p className="text-sm text-slate-400">Loading jobs...</p>
           ) : (
-            <table className="w-full text-sm">
-              <thead className="text-left text-slate-400">
-                <tr>
-                  <th className="py-2">Schedule</th>
-                  <th className="py-2">Subcontractor</th>
-                  <th className="py-2">Status</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Schedule</TableHead>
+                  <TableHead>Subcontractor</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {jobs.map((job) => (
-                  <tr key={job.id} className="border-t border-slate-800">
-                    <td className="py-3 text-slate-300">
+                  <TableRow key={job.id}>
+                    <TableCell>
                       <Link href={`/jobs/${job.id}`} className="hover:underline">
                         {job.scheduled_date} {job.scheduled_window_start}-
                         {job.scheduled_window_end}
                       </Link>
-                    </td>
-                    <td className="py-3 text-slate-300">
+                    </TableCell>
+                    <TableCell>
                       {job.assignments?.[0]?.subcontractor?.name ?? "—"}
-                    </td>
-                    <td className="py-3 text-slate-300">{job.status}</td>
-                  </tr>
+                    </TableCell>
+                    <TableCell>
+                      <Badge>{job.status}</Badge>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           )}
-        </div>
-      </section>
+        </CardContent>
+      </Card>
     </div>
   );
 }

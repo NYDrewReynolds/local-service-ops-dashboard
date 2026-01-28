@@ -2,6 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { getJob } from "@/lib/api";
 
 type Job = {
@@ -52,40 +61,57 @@ export default function JobDetailPage({ params }: { params: { id: string } }) {
           Back to jobs
         </Link>
         <h2 className="text-2xl font-semibold">Job {job.id}</h2>
-        <p className="text-sm text-slate-400">Status: {job.status}</p>
+        <div className="mt-2">
+          <Badge>{job.status}</Badge>
+        </div>
       </header>
 
-      <section className="rounded-lg border border-slate-800 bg-slate-900 p-6">
-        <h3 className="text-lg font-semibold">Schedule</h3>
-        <p className="mt-2 text-sm text-slate-300">
-          {job.scheduled_date} {job.scheduled_window_start} -{" "}
-          {job.scheduled_window_end}
-        </p>
-      </section>
-
-      <section className="rounded-lg border border-slate-800 bg-slate-900 p-6">
-        <h3 className="text-lg font-semibold">Assignment</h3>
-        {job.assignments?.map((assignment) => (
-          <div key={assignment.id} className="mt-3 text-sm text-slate-300">
-            <p className="text-slate-100">
-              {assignment.subcontractor?.name || "Unassigned"}
-            </p>
-            <p>Status: {assignment.status}</p>
-            <p>Phone: {assignment.subcontractor?.phone || "—"}</p>
-          </div>
-        ))}
-      </section>
-
-      <section className="rounded-lg border border-slate-800 bg-slate-900 p-6">
-        <h3 className="text-lg font-semibold">Notification</h3>
-        {job.notification ? (
-          <p className="mt-2 text-sm text-slate-300">
-            {job.notification.status} → {job.notification.to}
+      <Card>
+        <CardHeader>
+          <CardTitle>Schedule</CardTitle>
+          <CardDescription>Service window assigned to the job.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-slate-300">
+            {job.scheduled_date} {job.scheduled_window_start} -{" "}
+            {job.scheduled_window_end}
           </p>
-        ) : (
-          <p className="mt-2 text-sm text-slate-400">No notification yet.</p>
-        )}
-      </section>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Assignment</CardTitle>
+          <CardDescription>Current subcontractor status.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {job.assignments?.map((assignment) => (
+            <div key={assignment.id} className="text-sm text-slate-300">
+              <p className="text-slate-100">
+                {assignment.subcontractor?.name || "Unassigned"}
+              </p>
+              <p>Status: {assignment.status}</p>
+              <p>Phone: {assignment.subcontractor?.phone || "—"}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Notification</CardTitle>
+          <CardDescription>Stubbed delivery record.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {job.notification ? (
+            <p className="text-sm text-slate-300">
+              {job.notification.status} → {job.notification.to}
+            </p>
+          ) : (
+            <p className="text-sm text-slate-400">No notification yet.</p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

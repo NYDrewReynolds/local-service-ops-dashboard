@@ -1,6 +1,15 @@
 "use client";
 
 import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { populateDemo, resetDemo } from "@/lib/api";
 
 export default function DemoPage() {
@@ -57,31 +66,28 @@ export default function DemoPage() {
         </div>
       )}
 
-      <div className="rounded-lg border border-slate-800 bg-slate-900 p-6">
-        <h3 className="text-lg font-semibold">Seed Contents</h3>
-        <ul className="mt-3 list-disc space-y-2 pl-6 text-sm text-slate-300">
-          <li>3 services (removal, trimming, stump grinding)</li>
-          <li>3 subcontractors with availability and base rates</li>
-          <li>Simple pricing rules per service</li>
-          <li>5 sample leads with varying urgency</li>
-        </ul>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Seed Contents</CardTitle>
+          <CardDescription>What will be created.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="list-disc space-y-2 pl-6 text-sm text-slate-300">
+            <li>3 services (removal, trimming, stump grinding)</li>
+            <li>3 subcontractors with availability and base rates</li>
+            <li>Simple pricing rules per service</li>
+            <li>5 sample leads with varying urgency</li>
+          </ul>
+        </CardContent>
+      </Card>
 
       <div className="flex gap-3">
-        <button
-          className="rounded-md bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950"
-          onClick={handlePopulate}
-          disabled={loading || isProd}
-        >
+        <Button onClick={handlePopulate} disabled={loading || isProd}>
           Populate Demo Data
-        </button>
-        <button
-          className="rounded-md border border-slate-700 px-4 py-2 text-sm"
-          onClick={handleReset}
-          disabled={loading || isProd}
-        >
+        </Button>
+        <Button variant="outline" onClick={handleReset} disabled={loading || isProd}>
           Reset Demo Data
-        </button>
+        </Button>
       </div>
 
       {isProd && (
