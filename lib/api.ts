@@ -111,6 +111,48 @@ export async function getJob(id: string) {
   return data.job;
 }
 
+export async function getQuotes() {
+  const data = await apiFetch("/quotes");
+  return data.quotes ?? [];
+}
+
+export async function getQuote(id: string) {
+  assertId(id, "Quote id");
+  const data = await apiFetch(`/quotes/${id}`);
+  return data.quote;
+}
+
+export async function getAssignments() {
+  const data = await apiFetch("/assignments");
+  return data.assignments ?? [];
+}
+
+export async function getAssignment(id: string) {
+  assertId(id, "Assignment id");
+  const data = await apiFetch(`/assignments/${id}`);
+  return data.assignment;
+}
+
+export async function updateAssignment(id: string, payload: { status: string }) {
+  assertId(id, "Assignment id");
+  const data = await apiFetch(`/assignments/${id}`, {
+    method: "PATCH",
+    body: { assignment: payload },
+  });
+  return data.assignment;
+}
+
+export async function getNotifications() {
+  const data = await apiFetch("/notifications");
+  return data.notifications ?? [];
+}
+
+export async function getNotification(id: string) {
+  assertId(id, "Notification id");
+  const data = await apiFetch(`/notifications/${id}`);
+  return data.notification;
+}
+
 export async function getSubcontractors() {
   const data = await apiFetch("/subcontractors");
   return data.subcontractors ?? [];

@@ -4,10 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
+  Bell,
   Briefcase,
   ClipboardList,
   Database,
+  FileText,
   Home,
+  ListChecks,
   Plus,
   Search,
   Settings,
@@ -55,7 +58,10 @@ type Subcontractor = {
 
 const navItems = [
   { href: "/leads", label: "Leads", icon: ClipboardList },
+  { href: "/quotes", label: "Quotes", icon: FileText },
   { href: "/jobs", label: "Jobs", icon: Briefcase },
+  { href: "/assignments", label: "Assignments", icon: ListChecks },
+  { href: "/notifications", label: "Notifications", icon: Bell },
   { href: "/subcontractors", label: "Subcontractors", icon: Users },
 ];
 
@@ -303,7 +309,7 @@ export default function DashboardShell({
             )}
           </div>
           <Button asChild size="sm">
-            <Link href="/leads">
+            <Link href="/leads/new">
               <Plus className="size-4" />
               New Lead
             </Link>
