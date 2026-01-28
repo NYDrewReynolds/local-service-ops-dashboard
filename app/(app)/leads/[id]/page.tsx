@@ -45,6 +45,7 @@ type Subcontractor = {
 };
 
 export default function LeadDetailPage({ params }: { params: { id: string } }) {
+  const leadId = params.id;
   const [lead, setLead] = useState<Lead | null>(null);
   const [pricingRules, setPricingRules] = useState<PricingRule[]>([]);
   const [subcontractors, setSubcontractors] = useState<Subcontractor[]>([]);
@@ -54,13 +55,19 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
   const [error, setError] = useState<string | null>(null);
 
   const loadData = async () => {
+    if (!leadId || leadId === "undefined") {
+      setError("Missing lead id.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const [leadData, pricingData, subcontractorData, timelineData] =
         await Promise.all([
-          getLead(params.id),
+          getLead(leadId),
           getPricingRules(),
           getSubcontractors(),
-          getTimeline(params.id),
+          getTimeline(leadId),
         ]);
       setLead(leadData);
       setPricingRules(pricingData);
@@ -76,12 +83,17 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     loadData();
-  }, [params.id]);
+  }, [leadId]);
 
   const handleRunAgent = async (mode: "plan_only" | "execute") => {
+    if (!leadId || leadId === "undefined") {
+      setError("Missing lead id.");
+      return;
+    }
+
     setLoading(true);
     try {
-      const result = await runAgent(params.id, mode);
+      const result = await runAgent(leadId, mode);
       setAgentResult(result);
       await loadData();
     } catch (err) {

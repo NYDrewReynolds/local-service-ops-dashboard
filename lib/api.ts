@@ -1,7 +1,13 @@
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000/api/v1";
 
-type ApiOptions = RequestInit & { body?: unknown };
+type ApiOptions = Omit<RequestInit, "body"> & { body?: unknown };
+
+function assertId(id: string | undefined, label: string) {
+  if (!id || id === "undefined") {
+    throw new Error(`${label} is required`);
+  }
+}
 
 async function apiFetch(path: string, options: ApiOptions = {}) {
   const response = await fetch(`${API_BASE}${path}`, {
@@ -65,6 +71,7 @@ export async function getLeads(): Promise<Lead[]> {
 }
 
 export async function getLead(id: string): Promise<Lead> {
+  assertId(id, "Lead id");
   const data = await apiFetch(`/leads/${id}`);
   return data.lead;
 }
@@ -86,6 +93,7 @@ export async function updateLead(id: string, payload: Partial<Lead>) {
 }
 
 export async function runAgent(leadId: string, mode: "plan_only" | "execute") {
+  assertId(leadId, "Lead id");
   return apiFetch(`/leads/${leadId}/agent_runs`, {
     method: "POST",
     body: { mode },
@@ -98,6 +106,7 @@ export async function getJobs() {
 }
 
 export async function getJob(id: string) {
+  assertId(id, "Job id");
   const data = await apiFetch(`/jobs/${id}`);
   return data.job;
 }
@@ -113,6 +122,7 @@ export async function getPricingRules() {
 }
 
 export async function getTimeline(leadId: string) {
+  assertId(leadId, "Lead id");
   const data = await apiFetch(`/leads/${leadId}/timeline`);
   return data.timeline ?? [];
 }
