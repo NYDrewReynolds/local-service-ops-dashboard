@@ -114,7 +114,7 @@ export default function LeadsPage() {
                     <TableCell>{lead.service_requested}</TableCell>
                     <TableCell>{lead.urgency_hint || "—"}</TableCell>
                     <TableCell>
-                      <Badge variant={lead.status === "failed" ? "destructive" : "secondary"}>
+                      <Badge variant={lead.status === "failed" ? "outline" : "secondary"}>
                         {lead.status}
                       </Badge>
                     </TableCell>

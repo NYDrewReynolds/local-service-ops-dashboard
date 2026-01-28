@@ -7,6 +7,12 @@ import { useParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -18,6 +24,7 @@ import {
   getLead,
   getPricingRules,
   getSubcontractors,
+  getJobs,
   getTimeline,
   runAgent,
   Lead,
@@ -46,6 +53,16 @@ type Subcontractor = {
   }>;
 };
 
+type Job = {
+  id: string;
+  status: string;
+  scheduled_date: string;
+  scheduled_window_start: string;
+  scheduled_window_end: string;
+  lead_id: string;
+  assignments?: Array<{ status: string }>;
+};
+
 export default function LeadDetailPage() {
   const params = useParams<{ id?: string }>();
   const leadId =
@@ -53,6 +70,7 @@ export default function LeadDetailPage() {
   const [lead, setLead] = useState<Lead | null>(null);
   const [pricingRules, setPricingRules] = useState<PricingRule[]>([]);
   const [subcontractors, setSubcontractors] = useState<Subcontractor[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [timeline, setTimeline] = useState<Array<Record<string, unknown>>>([]);
   const [agentResult, setAgentResult] = useState<AgentRunResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -66,16 +84,18 @@ export default function LeadDetailPage() {
     }
 
     try {
-      const [leadData, pricingData, subcontractorData, timelineData] =
+      const [leadData, pricingData, subcontractorData, timelineData, jobsData] =
         await Promise.all([
           getLead(leadId),
           getPricingRules(),
           getSubcontractors(),
           getTimeline(leadId),
+          getJobs(),
         ]);
       setLead(leadData);
       setPricingRules(pricingData);
       setSubcontractors(subcontractorData);
+      setJobs(jobsData.filter((job: Job) => job.lead_id === leadId));
       setTimeline(timelineData);
       setError(null);
     } catch (err) {
@@ -139,6 +159,20 @@ export default function LeadDetailPage() {
     currency: "USD",
   });
 
+  const subcontractorNameById = subcontractors.reduce<Record<string, string>>(
+    (acc, sub) => {
+      acc[sub.id] = sub.name;
+      return acc;
+    },
+    {}
+  );
+
+  const activeAssignment = jobs.some((job) =>
+    job.assignments?.some((assignment) =>
+      ["assigned", "confirmed"].includes(assignment.status)
+    )
+  );
+
   return (
     <div className="space-y-8">
       <header className="flex items-center justify-between">
@@ -157,9 +191,25 @@ export default function LeadDetailPage() {
           >
             Run Agent (Plan Only)
           </Button>
-          <Button onClick={() => handleRunAgent("execute")} disabled={loading}>
-            Run Agent (Execute)
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button
+                    onClick={() => handleRunAgent("execute")}
+                    disabled={loading || activeAssignment}
+                  >
+                    Run Agent (Execute)
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              {activeAssignment && (
+                <TooltipContent>
+                  Lead already assigned
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </header>
 
@@ -199,7 +249,7 @@ export default function LeadDetailPage() {
               <div>
                 <dt className="text-muted-foreground">Status</dt>
                 <dd>
-                  <Badge variant={lead.status === "failed" ? "destructive" : "secondary"}>
+                  <Badge variant={lead.status === "failed" ? "outline" : "secondary"}>
                     {lead.status}
                   </Badge>
                 </dd>
@@ -257,6 +307,32 @@ export default function LeadDetailPage() {
 
       <Card>
         <CardHeader>
+          <CardTitle>Jobs</CardTitle>
+          <CardDescription>Jobs created for this lead.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm text-muted-foreground">
+          {jobs.length === 0 ? (
+            <p>No jobs created yet.</p>
+          ) : (
+            jobs.map((job) => (
+              <div key={job.id} className="rounded-md border border-border bg-muted p-3">
+                <p className="text-foreground">
+                  {job.scheduled_date} {job.scheduled_window_start}-{job.scheduled_window_end}
+                </p>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">{job.status}</Badge>
+                  <Link href={`/jobs/${job.id}`} className="text-foreground underline">
+                    View job
+                  </Link>
+                </div>
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Agent Output</CardTitle>
           <CardDescription>Latest plan + execution results.</CardDescription>
         </CardHeader>
@@ -302,7 +378,12 @@ export default function LeadDetailPage() {
                   </div>
                   <div>
                     <p className="text-xs uppercase text-muted-foreground">Subcontractor</p>
-                    <p className="text-foreground">{plan?.subcontractor_id || "—"}</p>
+                    <p className="text-foreground">
+                      {plan?.subcontractor_id
+                        ? subcontractorNameById[plan.subcontractor_id] ||
+                          plan.subcontractor_id
+                        : "—"}
+                    </p>
                   </div>
                   <div className="md:col-span-2">
                     <p className="text-xs uppercase text-muted-foreground">Customer Message</p>

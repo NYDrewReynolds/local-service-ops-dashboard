@@ -26,6 +26,19 @@ type Subcontractor = {
 };
 
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const timeFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/New_York",
+  hour: "numeric",
+  minute: "2-digit",
+});
+
+function formatTime(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return timeFormatter.format(date);
+}
 
 export default function SubcontractorsPage() {
   const [subcontractors, setSubcontractors] = useState<Subcontractor[]>([]);
@@ -71,11 +84,14 @@ export default function SubcontractorsPage() {
               </p>
               <div className="mt-4">
                 <p className="text-xs uppercase text-muted-foreground">Availability</p>
+                <p className="text-xs text-muted-foreground">
+                  All times shown in New York (ET).
+                </p>
                 <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
                   {sub.subcontractor_availabilities.map((slot) => (
                     <li key={slot.id}>
-                      {dayNames[slot.day_of_week]} {slot.window_start}-
-                      {slot.window_end}
+                      {dayNames[slot.day_of_week]} {formatTime(slot.window_start)} to{" "}
+                      {formatTime(slot.window_end)}
                     </li>
                   ))}
                 </ul>
