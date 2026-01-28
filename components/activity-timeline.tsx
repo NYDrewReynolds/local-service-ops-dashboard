@@ -108,9 +108,13 @@ export default function ActivityTimeline({
           ? actionLinks[event.action_type]
           : undefined;
         const linkHref = linkConfig?.buildHref(event.payload ?? undefined);
-        const isInlineLink =
-          event.action_type === "create_quote" ||
-          event.action_type === "create_job";
+        const isInlineLink = [
+          "create_quote",
+          "create_job",
+          "assign_subcontractor",
+          "send_notification",
+          "assignment_declined",
+        ].includes(event.action_type || "");
 
         return (
           <div
