@@ -16,6 +16,9 @@ async function apiFetch(path: string, options: ApiOptions = {}) {
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
+    if (response.status === 401 && typeof window !== "undefined") {
+      window.location.href = "/sign-in";
+    }
     throw new Error(data.error || "Request failed");
   }
 
@@ -47,6 +50,14 @@ export type AgentRunResult = {
   notification?: Record<string, unknown>;
   errors?: unknown;
 };
+
+export async function login(payload: { email: string; password: string }) {
+  const data = await apiFetch("/auth/login", {
+    method: "POST",
+    body: payload,
+  });
+  return data.admin_user;
+}
 
 export async function getLeads(): Promise<Lead[]> {
   const data = await apiFetch("/leads");

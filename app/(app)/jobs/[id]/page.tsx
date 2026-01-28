@@ -46,10 +46,10 @@ export default function JobDetailPage({ params }: { params: { id: string } }) {
   if (!job) {
     return (
       <div className="space-y-4">
-        <Link href="/jobs" className="text-sm text-slate-400 underline">
+        <Link href="/jobs" className="text-sm text-muted-foreground underline">
           Back to jobs
         </Link>
-        <p className="text-sm text-slate-300">{error || "Loading job..."}</p>
+        <p className="text-sm text-muted-foreground">{error || "Loading job..."}</p>
       </div>
     );
   }
@@ -57,12 +57,12 @@ export default function JobDetailPage({ params }: { params: { id: string } }) {
   return (
     <div className="space-y-6">
       <header>
-        <Link href="/jobs" className="text-sm text-slate-400 underline">
+        <Link href="/jobs" className="text-sm text-muted-foreground underline">
           Back to jobs
         </Link>
         <h2 className="text-2xl font-semibold">Job {job.id}</h2>
         <div className="mt-2">
-          <Badge>{job.status}</Badge>
+          <Badge variant="secondary">{job.status}</Badge>
         </div>
       </header>
 
@@ -72,7 +72,7 @@ export default function JobDetailPage({ params }: { params: { id: string } }) {
           <CardDescription>Service window assigned to the job.</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-slate-300">
+          <p className="text-sm text-muted-foreground">
             {job.scheduled_date} {job.scheduled_window_start} -{" "}
             {job.scheduled_window_end}
           </p>
@@ -86,8 +86,8 @@ export default function JobDetailPage({ params }: { params: { id: string } }) {
         </CardHeader>
         <CardContent>
           {job.assignments?.map((assignment) => (
-            <div key={assignment.id} className="text-sm text-slate-300">
-              <p className="text-slate-100">
+            <div key={assignment.id} className="text-sm text-muted-foreground">
+              <p className="text-foreground">
                 {assignment.subcontractor?.name || "Unassigned"}
               </p>
               <p>Status: {assignment.status}</p>
@@ -104,11 +104,11 @@ export default function JobDetailPage({ params }: { params: { id: string } }) {
         </CardHeader>
         <CardContent>
           {job.notification ? (
-            <p className="text-sm text-slate-300">
+            <p className="text-sm text-muted-foreground">
               {job.notification.status} → {job.notification.to}
             </p>
           ) : (
-            <p className="text-sm text-slate-400">No notification yet.</p>
+            <p className="text-sm text-muted-foreground">No notification yet.</p>
           )}
         </CardContent>
       </Card>

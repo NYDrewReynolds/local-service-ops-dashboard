@@ -48,7 +48,7 @@ export default function DemoPage() {
     <div className="space-y-6">
       <header>
         <h2 className="text-2xl font-semibold">Demo Data</h2>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-muted-foreground">
           Creates sample services, subcontractors, pricing rules, and leads using
           synthetic data.
         </p>
@@ -61,7 +61,7 @@ export default function DemoPage() {
       )}
 
       {error && (
-        <div className="rounded-md border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200">
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
           {error}
         </div>
       )}
@@ -72,7 +72,7 @@ export default function DemoPage() {
           <CardDescription>What will be created.</CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="list-disc space-y-2 pl-6 text-sm text-slate-300">
+          <ul className="list-disc space-y-2 pl-6 text-sm text-muted-foreground">
             <li>3 services (removal, trimming, stump grinding)</li>
             <li>3 subcontractors with availability and base rates</li>
             <li>Simple pricing rules per service</li>
@@ -91,7 +91,7 @@ export default function DemoPage() {
       </div>
 
       {isProd && (
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-muted-foreground">
           Demo actions are disabled in production.
         </p>
       )}

@@ -92,16 +92,16 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
   };
 
   if (loading && !lead) {
-    return <p className="text-sm text-slate-400">Loading lead...</p>;
+    return <p className="text-sm text-muted-foreground">Loading lead...</p>;
   }
 
   if (!lead) {
     return (
       <div className="space-y-4">
-        <Link href="/leads" className="text-sm text-slate-300 underline">
+        <Link href="/leads" className="text-sm text-muted-foreground underline">
           Back to leads
         </Link>
-        <p className="text-sm text-slate-300">Lead not found.</p>
+        <p className="text-sm text-muted-foreground">Lead not found.</p>
       </div>
     );
   }
@@ -110,11 +110,11 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
     <div className="space-y-8">
       <header className="flex items-center justify-between">
         <div>
-          <Link href="/leads" className="text-sm text-slate-400 underline">
+          <Link href="/leads" className="text-sm text-muted-foreground underline">
             Back to leads
           </Link>
           <h2 className="text-2xl font-semibold">{lead.full_name}</h2>
-          <p className="text-sm text-slate-400">{lead.service_requested}</p>
+          <p className="text-sm text-muted-foreground">{lead.service_requested}</p>
         </div>
         <div className="flex gap-3">
           <Button
@@ -124,17 +124,14 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
           >
             Run Agent (Plan Only)
           </Button>
-          <Button
-            onClick={() => handleRunAgent("execute")}
-            disabled={loading}
-          >
+          <Button onClick={() => handleRunAgent("execute")} disabled={loading}>
             Run Agent (Execute)
           </Button>
         </div>
       </header>
 
       {error && (
-        <div className="rounded-md border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200">
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
           {error}
         </div>
       )}
@@ -146,37 +143,37 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
             <CardDescription>Contact + request summary.</CardDescription>
           </CardHeader>
           <CardContent>
-            <dl className="space-y-3 text-sm text-slate-300">
+            <dl className="space-y-3 text-sm text-muted-foreground">
               <div>
-                <dt className="text-slate-400">Email</dt>
-                <dd>{lead.email || "—"}</dd>
+                <dt className="text-muted-foreground">Email</dt>
+                <dd className="text-foreground">{lead.email || "—"}</dd>
               </div>
               <div>
-                <dt className="text-slate-400">Phone</dt>
-                <dd>{lead.phone || "—"}</dd>
+                <dt className="text-muted-foreground">Phone</dt>
+                <dd className="text-foreground">{lead.phone || "—"}</dd>
               </div>
               <div>
-                <dt className="text-slate-400">Address</dt>
-                <dd>
+                <dt className="text-muted-foreground">Address</dt>
+                <dd className="text-foreground">
                   {lead.address_line1}, {lead.city}, {lead.state}{" "}
                   {lead.postal_code}
                 </dd>
               </div>
               <div>
-                <dt className="text-slate-400">Urgency</dt>
-                <dd>{lead.urgency_hint || "—"}</dd>
+                <dt className="text-muted-foreground">Urgency</dt>
+                <dd className="text-foreground">{lead.urgency_hint || "—"}</dd>
               </div>
               <div>
-                <dt className="text-slate-400">Status</dt>
+                <dt className="text-muted-foreground">Status</dt>
                 <dd>
-                  <Badge variant={lead.status === "failed" ? "danger" : "default"}>
+                  <Badge variant={lead.status === "failed" ? "destructive" : "secondary"}>
                     {lead.status}
                   </Badge>
                 </dd>
               </div>
               <div>
-                <dt className="text-slate-400">Notes</dt>
-                <dd>{lead.notes || "—"}</dd>
+                <dt className="text-muted-foreground">Notes</dt>
+                <dd className="text-foreground">{lead.notes || "—"}</dd>
               </div>
             </dl>
           </CardContent>
@@ -188,10 +185,10 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
             <CardDescription>Guardrails applied to quotes.</CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2 text-sm text-slate-300">
+            <ul className="space-y-2 text-sm text-muted-foreground">
               {pricingRules.map((rule) => (
                 <li key={rule.id}>
-                  <span className="font-medium text-slate-100">
+                  <span className="font-medium text-foreground">
                     {rule.service_code}
                   </span>{" "}
                   — min {rule.min_price_cents} / max {rule.max_price_cents} / base{" "}
@@ -211,12 +208,12 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2">
             {subcontractors.map((sub) => (
-              <Card key={sub.id} className="border-slate-800 bg-slate-950">
+              <Card key={sub.id}>
                 <CardHeader>
                   <CardTitle className="text-base">{sub.name}</CardTitle>
                   <CardDescription>{sub.phone}</CardDescription>
                 </CardHeader>
-                <CardContent className="pt-0 text-xs text-slate-500">
+                <CardContent className="pt-0 text-xs text-muted-foreground">
                   Services: {sub.service_codes.join(", ")}
                 </CardContent>
               </Card>
@@ -233,41 +230,41 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
         <CardContent>
           {agentResult ? (
             <div className="grid gap-4 lg:grid-cols-2">
-              <div className="rounded-md border border-slate-800 bg-slate-950 p-4">
-                <p className="text-xs text-slate-400">Plan JSON</p>
-                <pre className="mt-2 max-h-80 overflow-auto text-xs text-slate-200">
+              <div className="rounded-md border border-border bg-muted p-4">
+                <p className="text-xs text-muted-foreground">Plan JSON</p>
+                <pre className="mt-2 max-h-80 overflow-auto text-xs text-foreground">
                   {JSON.stringify(agentResult.plan, null, 2)}
                 </pre>
               </div>
-              <div className="space-y-3 text-sm text-slate-300">
+              <div className="space-y-3 text-sm text-muted-foreground">
                 <div>
-                  <p className="text-slate-400">Quote</p>
-                  <pre className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200">
+                  <p className="text-muted-foreground">Quote</p>
+                  <pre className="rounded-md border border-border bg-muted p-3 text-xs text-foreground">
                     {JSON.stringify(agentResult.quote, null, 2)}
                   </pre>
                 </div>
                 <div>
-                  <p className="text-slate-400">Job</p>
-                  <pre className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200">
+                  <p className="text-muted-foreground">Job</p>
+                  <pre className="rounded-md border border-border bg-muted p-3 text-xs text-foreground">
                     {JSON.stringify(agentResult.job, null, 2)}
                   </pre>
                 </div>
                 <div>
-                  <p className="text-slate-400">Assignment</p>
-                  <pre className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200">
+                  <p className="text-muted-foreground">Assignment</p>
+                  <pre className="rounded-md border border-border bg-muted p-3 text-xs text-foreground">
                     {JSON.stringify(agentResult.assignment, null, 2)}
                   </pre>
                 </div>
                 <div>
-                  <p className="text-slate-400">Notification</p>
-                  <pre className="rounded-md border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200">
+                  <p className="text-muted-foreground">Notification</p>
+                  <pre className="rounded-md border border-border bg-muted p-3 text-xs text-foreground">
                     {JSON.stringify(agentResult.notification, null, 2)}
                   </pre>
                 </div>
               </div>
             </div>
           ) : (
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-muted-foreground">
               Run the agent to view the plan and generated records.
             </p>
           )}
@@ -280,14 +277,16 @@ export default function LeadDetailPage({ params }: { params: { id: string } }) {
           <CardDescription>Agent + execution activity.</CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-3 text-sm text-slate-300">
+          <ul className="space-y-3 text-sm text-muted-foreground">
             {timeline.map((event) => (
               <li
                 key={`${event.type}-${event.id}`}
-                className="rounded-md border border-slate-800 bg-slate-950 p-3"
+                className="rounded-md border border-border bg-muted p-3"
               >
-                <p className="text-xs uppercase text-slate-500">{event.type}</p>
-                <pre className="mt-2 text-xs text-slate-200">
+                <p className="text-xs uppercase text-muted-foreground">
+                  {event.type}
+                </p>
+                <pre className="mt-2 text-xs text-foreground">
                   {JSON.stringify(event, null, 2)}
                 </pre>
               </li>

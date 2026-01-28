@@ -108,7 +108,7 @@ export default function LeadsPage() {
       <header className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold">Leads</h2>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-muted-foreground">
             Intake, plan, and execution workflow.
           </p>
         </div>
@@ -120,7 +120,7 @@ export default function LeadsPage() {
       </header>
 
       {error && (
-        <div className="rounded-md border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200">
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
           {error}
         </div>
       )}
@@ -160,7 +160,7 @@ export default function LeadsPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p className="text-sm text-slate-400">Loading leads...</p>
+            <p className="text-sm text-muted-foreground">Loading leads...</p>
           ) : (
             <Table>
               <TableHeader>
@@ -182,7 +182,7 @@ export default function LeadsPage() {
                     <TableCell>{lead.service_requested}</TableCell>
                     <TableCell>{lead.urgency_hint || "—"}</TableCell>
                     <TableCell>
-                      <Badge variant={lead.status === "failed" ? "danger" : "default"}>
+                      <Badge variant={lead.status === "failed" ? "destructive" : "secondary"}>
                         {lead.status}
                       </Badge>
                     </TableCell>

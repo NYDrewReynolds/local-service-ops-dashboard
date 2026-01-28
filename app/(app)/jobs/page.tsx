@@ -56,11 +56,11 @@ export default function JobsPage() {
     <div className="space-y-6">
       <header>
         <h2 className="text-2xl font-semibold">Jobs</h2>
-        <p className="text-sm text-slate-400">Scheduled and dispatched work.</p>
+        <p className="text-sm text-muted-foreground">Scheduled and dispatched work.</p>
       </header>
 
       {error && (
-        <div className="rounded-md border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200">
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
           {error}
         </div>
       )}
@@ -72,7 +72,7 @@ export default function JobsPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p className="text-sm text-slate-400">Loading jobs...</p>
+            <p className="text-sm text-muted-foreground">Loading jobs...</p>
           ) : (
             <Table>
               <TableHeader>
@@ -95,7 +95,7 @@ export default function JobsPage() {
                       {job.assignments?.[0]?.subcontractor?.name ?? "—"}
                     </TableCell>
                     <TableCell>
-                      <Badge>{job.status}</Badge>
+                      <Badge variant="secondary">{job.status}</Badge>
                     </TableCell>
                   </TableRow>
                 ))}
