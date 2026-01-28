@@ -12,8 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -22,43 +20,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { createLead, getLeads, populateDemo, Lead } from "@/lib/api";
-
-const emptyLead: Partial<Lead> = {
-  full_name: "",
-  email: "",
-  phone: "",
-  address_line1: "",
-  address_line2: "",
-  city: "",
-  state: "",
-  postal_code: "",
-  service_requested: "",
-  notes: "",
-  urgency_hint: "",
-};
+import { getLeads, populateDemo, Lead } from "@/lib/api";
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [form, setForm] = useState<Partial<Lead>>(emptyLead);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const showDemo = process.env.NODE_ENV !== "production";
-
-  const fields = [
-    { key: "full_name", label: "Full name" },
-    { key: "email", label: "Email" },
-    { key: "phone", label: "Phone" },
-    { key: "address_line1", label: "Address line 1" },
-    { key: "address_line2", label: "Address line 2" },
-    { key: "city", label: "City" },
-    { key: "state", label: "State" },
-    { key: "postal_code", label: "Postal code" },
-    { key: "service_requested", label: "Service requested" },
-    { key: "notes", label: "Notes" },
-    { key: "urgency_hint", label: "Urgency hint" },
-  ] as const;
 
   const loadLeads = async () => {
     setLoading(true);
@@ -76,20 +45,6 @@ export default function LeadsPage() {
   useEffect(() => {
     loadLeads();
   }, []);
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setSubmitting(true);
-    try {
-      await createLead(form);
-      setForm(emptyLead);
-      await loadLeads();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create lead");
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const handleDemo = async () => {
     setSubmitting(true);
@@ -112,11 +67,16 @@ export default function LeadsPage() {
             Intake, plan, and execution workflow.
           </p>
         </div>
-        {showDemo && (
-          <Button onClick={handleDemo} disabled={submitting}>
-            Populate Demo Data
+        <div className="flex items-center gap-3">
+          {showDemo && (
+            <Button variant="outline" onClick={handleDemo} disabled={submitting}>
+              Populate Demo Data
+            </Button>
+          )}
+          <Button asChild>
+            <Link href="/leads/new">Create Lead</Link>
           </Button>
-        )}
+        </div>
       </header>
 
       {error && (
@@ -124,34 +84,6 @@ export default function LeadsPage() {
           {error}
         </div>
       )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle>New Lead</CardTitle>
-          <CardDescription>Capture a new lead for planning.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
-            {fields.map((field) => (
-              <div key={field.key} className="grid gap-2">
-                <Label htmlFor={field.key}>{field.label}</Label>
-                <Input
-                  id={field.key}
-                  value={(form as Record<string, string | undefined>)[field.key] ?? ""}
-                  onChange={(event) =>
-                    setForm({ ...form, [field.key]: event.target.value })
-                  }
-                />
-              </div>
-            ))}
-            <div className="md:col-span-2 flex justify-end">
-              <Button type="submit" disabled={submitting}>
-                Create Lead
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
 
       <Card>
         <CardHeader>
