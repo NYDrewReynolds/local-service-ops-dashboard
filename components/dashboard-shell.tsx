@@ -10,6 +10,7 @@ import {
   Database,
   FileText,
   Home,
+  Layers,
   ListChecks,
   Plus,
   Search,
@@ -63,6 +64,7 @@ const navItems = [
   { href: "/assignments", label: "Assignments", icon: ListChecks },
   { href: "/notifications", label: "Notifications", icon: Bell },
   { href: "/subcontractors", label: "Subcontractors", icon: Users },
+  { href: "/services", label: "Services & Pricing", icon: Layers },
 ];
 
 const demoItems = [{ href: "/demo", label: "Demo Data", icon: Database }];

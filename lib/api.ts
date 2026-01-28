@@ -47,6 +47,12 @@ export type Lead = {
   status: string;
 };
 
+export type Service = {
+  id: string;
+  name: string;
+  code: string;
+};
+
 export type AgentRunResult = {
   agent_run: Record<string, unknown>;
   plan?: Record<string, unknown>;
@@ -156,6 +162,11 @@ export async function getNotification(id: string) {
 export async function getSubcontractors() {
   const data = await apiFetch("/subcontractors");
   return data.subcontractors ?? [];
+}
+
+export async function getServices(): Promise<Service[]> {
+  const data = await apiFetch("/services");
+  return data.services ?? [];
 }
 
 export async function getPricingRules() {
