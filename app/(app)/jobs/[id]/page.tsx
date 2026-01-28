@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -27,21 +28,25 @@ type Job = {
   notification?: { status: string; to: string };
 };
 
-export default function JobDetailPage({ params }: { params: { id: string } }) {
+export default function JobDetailPage() {
+  const params = useParams<{ id?: string }>();
+  const jobId =
+    typeof params?.id === "string" ? params.id : Array.isArray(params?.id) ? params.id[0] : undefined;
   const [job, setJob] = useState<Job | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await getJob(params.id);
+        if (!jobId) return;
+        const data = await getJob(jobId);
         setJob(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load job");
       }
     };
     load();
-  }, [params.id]);
+  }, [jobId]);
 
   if (!job) {
     return (
