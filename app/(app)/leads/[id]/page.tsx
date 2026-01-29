@@ -317,7 +317,8 @@ export default function LeadDetailPage() {
             jobs.map((job) => (
               <div key={job.id} className="rounded-md border border-border bg-muted p-3">
                 <p className="text-foreground">
-                  {job.scheduled_date} {job.scheduled_window_start}-{job.scheduled_window_end}
+                  {job.scheduled_date} {job.scheduled_window_start}-{job.scheduled_window_end}{" "}
+                  ET
                 </p>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary">{job.status}</Badge>
@@ -372,7 +373,7 @@ export default function LeadDetailPage() {
                     <p className="text-foreground">
                       {plan?.schedule?.date || "—"}{" "}
                       {plan?.schedule?.window_start
-                        ? `${plan.schedule.window_start}-${plan.schedule.window_end}`
+                        ? `${plan.schedule.window_start}-${plan.schedule.window_end} ET`
                         : ""}
                     </p>
                   </div>
